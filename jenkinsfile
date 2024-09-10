@@ -1,41 +1,42 @@
 pipeline {
     agent any
 
+    environment {
+        JAVA_HOME = tool name: 'JDK 11', type: 'jdk'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from Git repository
-                git 'https://github.com/chiragsunil/cartedo.git'
+                // Checkout code from version control system
+                git url: 'https://github.com/chiragsunil/cartedo.git', branch: 'main'
             }
         }
-
-        stage('Build') {
+        stage('Compile') {
             steps {
-                // Run Maven build
-                sh 'mvn clean install'
+                // Compile Java files
+                sh "${JAVA_HOME}/bin/javac -d out src/test/java/page1.java"
             }
         }
-
-        stage('Test') {
+        stage('Run') {
             steps {
-                // Run Maven tests
-                sh 'mvn test'
+                // Run the Java program
+                sh "${JAVA_HOME}/bin/java -cp out src/test/java/page1"
             }
         }
+    }
 
-        stage('Archive Results') {
-            steps {
-                // Archive test results
-                junit '**/target/surefire-reports/*.xml'
-            }
+    post {
+        always {
+            // Actions that are run after the pipeline is complete
+            echo 'Cleaning up...'
+            cleanWs()  // Clean workspace after build
         }
-
-        stage('Deploy') {
-            steps {
-                // Example deploy step
-                // Add deployment scripts or commands here
-                echo 'Deploying the application...'
-            }
+        success {
+            echo 'Build and execution succeeded!'
+        }
+        failure {
+            echo 'Build or execution failed!'
         }
     }
 }
