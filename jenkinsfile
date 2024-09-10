@@ -2,12 +2,39 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from Git repository
+                git 'https://github.com/chiragsunil/Cartedo.git'
+            }
+        }
+
         stage('Build') {
             steps {
-                script {
-                    // Run the specific test file
-                    sh 'mvn clean test -Dtest=naukrilogin.NaukriLogin'
-                }
+                // Run Maven build
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run Maven tests
+                sh 'mvn test'
+            }
+        }
+
+        stage('Archive Results') {
+            steps {
+                // Archive test results
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Example deploy step
+                // Add deployment scripts or commands here
+                echo 'Deploying the application...'
             }
         }
     }
